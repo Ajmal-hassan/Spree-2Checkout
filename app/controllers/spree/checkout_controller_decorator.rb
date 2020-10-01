@@ -1,9 +1,10 @@
 module Spree
-  CheckoutController.class_eval do
-    skip_before_filter :verify_authenticity_token, :ensure_valid_state
-    before_filter :two_checkout_hook, :only => [:update]
-
-    helper_method :payment_method
+  module CheckoutControllerDecorator
+    def self.prepended(base)
+      # base.skip_before_action :verify_authenticity_token, :ensure_valid_state
+      base.before_action :two_checkout_hook, :only => [:update]
+      base.helper_method :payment_method
+    end
 
     def two_checkout_payment
       load_order_with_lock
@@ -30,7 +31,7 @@ module Spree
      payment_method_id = PaymentMethod.find(params[:order][:payments_attributes].first[:payment_method_id])
      if payment_method_id.kind_of?(BillingIntegration::TwoCheckout)
        load_order_with_lock
-       @order.payments.create(:amount => @order.total, :payment_method_id => payment_method_id.id)
+       @order.payments.create(:amount => @order.total, :payment_method_id => payment_method_id.id, source: payment_method_id)
        redirect_to(two_checkout_payment_order_checkout_url(@order, :payment_method => payment_method_id))
      end
     end
@@ -51,3 +52,4 @@ module Spree
     end
   end
 end
+::Spree::CheckoutController.prepend Spree::CheckoutControllerDecorator

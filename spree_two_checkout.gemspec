@@ -6,6 +6,7 @@ Gem::Specification.new do |s|
   s.summary     = 'Spree 2Checkout Payment Module'
   s.description = 'Spree 2Checkout Payment Module'
   s.required_ruby_version = '>= 1.9.1'
+  spree_version = '>= 3.1.0', '< 5.0.0'
 
   s.author            = 'Craig Christenson'
   s.email             = 'christensoncraig@gmail.com'
